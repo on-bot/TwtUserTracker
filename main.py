@@ -61,6 +61,11 @@ def send_message(victim, user, url):
     response = webhook.execute()
 
 
+def send_log(victim, url):
+    webhook = DiscordWebhook(url=url, content=f"Checking if {victim} followed any users")
+    response = webhook.execute()
+
+
 # General Function
 def is_empty(file):
     try:
@@ -109,6 +114,7 @@ while 1:
 
     victim_new_followings_ids = {}
     for i in victims:
+        send_log(i, os.environ["LOG_WEBHOOK"])
         victim_new_followings_ids[i] = scrape_user_friends(i)
         if is_same(victim_new_followings_ids[i], victim_followings_ids[i]):
             new_users = []
@@ -118,7 +124,7 @@ while 1:
                 if user not in victim_followings_ids[i]:
                     new_users.append(get_screen_name(user))
         for user in new_users:
-            send_message(i, user, os.environ["WEBHOOK"])
+            send_message(i, user, os.environ["MAIN_WEBHOOK"])
         time.sleep(delay)
     json_obj = json.dumps(victim_new_followings_ids, indent=4)
     with open('./data/temp.json', 'w') as f:

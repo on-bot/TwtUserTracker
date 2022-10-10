@@ -21,8 +21,7 @@ intents.members = True
 client = commands.Bot(intents=intents, command_prefix='.')
 
 # Getting config datas
-conf = open("./config/config.json")
-config = json.load(conf)
+config = collection.find_one({"_id": 0})
 
 # Twitter auth
 auth = tweepy.OAuth1UserHandler(config['twitter_credentials']['consumer_key'],

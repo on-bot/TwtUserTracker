@@ -6,6 +6,11 @@ import collections
 from discord_webhook import DiscordWebhook, DiscordEmbed
 from pymongo import MongoClient
 
+# Importing Database
+cluster = MongoClient(os.environ["MONGO_API"])
+db = cluster["discord"]
+collection = db["twitter followings"]
+
 # Getting config datas
 config = collection.find_one({"_id": 0})
 

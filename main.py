@@ -10,9 +10,10 @@ from pymongo import MongoClient
 cluster = MongoClient(os.environ["MONGO_API"])
 db = cluster["discord"]
 collection = db["twitter followings"]
+ollection2 = db["config"]
 
 # Getting config datas
-config = collection.find_one({"_id": 0})
+config = collection2.find_one({"_id": 0})
 
 # Twitter auth
 client = tweepy.Client(bearer_token=config['twitter_credentials']['bearer_token'],

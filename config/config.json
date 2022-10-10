@@ -8,5 +8,8 @@
     },
     "victims": []
     ,
-    "webhook": ""
+    "main_webhook": "",
+    "log_webhook": "",
+    "sec_webhook": "",
+    "sec_log_webhook": ""
 }

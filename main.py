@@ -97,7 +97,7 @@ def is_same(list1, list2):
 
 # Polling Twitter Followings
 while 1:
-    victims = collection.find_one({"_id": 0})['victims']
+    victims = collection2.find_one({"_id": 0})['victims']
     delay = 60
     if is_empty():
         for i in victims:

@@ -9,7 +9,7 @@ from tweepy import HTTPException
 from pymongo import MongoClient
 
 # Importing Database
-cluster = MongoClient("mongodb+srv://ash:DtBlA6DGz1JkP9gC@cluster0.zxfi6gx.mongodb.net/?retryWrites=true&w=majority")
+cluster = MongoClient(os.environ["MONGO_API"])
 
 db = cluster["discord"]
 collection = db["config"]

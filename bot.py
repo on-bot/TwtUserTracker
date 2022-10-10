@@ -1,11 +1,18 @@
 # Imports
 import discord
 from discord.ext import commands
-import os
+import datetime
 import json
 import tweepy
-import datetime
+import os
 from tweepy import HTTPException
+from pymongo import MongoClient
+
+# Importing Database
+cluster = MongoClient("mongodb+srv://ash:DtBlA6DGz1JkP9gC@cluster0.zxfi6gx.mongodb.net/?retryWrites=true&w=majority")
+
+db = cluster["discord"]
+collection = db["config"]
 
 # Discord Intents
 intents = discord.Intents.all()
@@ -18,10 +25,10 @@ conf = open("./config/config.json")
 config = json.load(conf)
 
 # Twitter auth
-auth = tweepy.OAuth1UserHandler(os.environ["CONSUMER_KEY"],
-                                os.environ["CONSUMER_SECRET"],
-                                os.environ["ACCESS_TOKEN"],
-                                os.environ["ACCESS_TOKEN_SECRET"])
+auth = tweepy.OAuth1UserHandler(config['twitter_credentials']['consumer_key'],
+                                config['twitter_credentials']['consumer_secret'],
+                                config['twitter_credentials']['access_token'],
+                                config['twitter_credentials']['access_token_secret'])
 
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
@@ -30,12 +37,14 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 @client.command()
 async def add(ctx, username):
     try:
+        datas = collection.find_one({"_id": 0})
+        if username in datas['victims']:
+            await ctx.send("User is already on tracklist")
+            return
         user = api.get_user(screen_name=username)
-        dicts = json.load(open('./config/config.json'))
-        dicts['victims'].append(username)
-        json_obj = json.dumps(dicts, indent=4)
-        with open('./config/config.json', 'w') as f:
-            f.write(json_obj)
+        datas['victims'].append(username)
+        collection.delete_one({"_id": 0})
+        collection.insert_one(datas)
         await ctx.send(f"{username} has been added successfully")
     except HTTPException as e:
         await ctx.send("User not found")
@@ -43,22 +52,19 @@ async def add(ctx, username):
 
 @client.command()
 async def remove(ctx, username):
-    dicts = json.load(open('./config/config.json'))
-    if username in dicts['victims']:
-        dicts['victims'].remove(username)
-        json_obj = json.dumps(dicts, indent=4)
-        with open('./config/config.json', 'w') as f:
-            f.write(json_obj)
+    datas = collection.find_one({"_id": 0})
+    if username in datas['victims']:
+        datas['victims'].remove(username)
+        collection.delete_one({"_id": 0})
+        collection.insert_one(datas)
         await ctx.send(f"{username} has been removed successfully")
     else:
         await ctx.send(f"{username} was never added")
 
-
 @client.command()
 async def showtracks(ctx):
-    conf = open("./config/config.json")
-    config = json.load(conf)
-    victims = config['victims']
+    datas = collection.find_one({"_id": 0})
+    victims = datas['victims']
     victims = [f'{count + 1}. {i}' for count, i in enumerate(victims)]
     victims = '\n'.join(victims)
     embed = discord.Embed(title='Tracked Users', colour=discord.Colour.blue())
@@ -67,5 +73,5 @@ async def showtracks(ctx):
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text='\u200b')
     await ctx.send(embed=embed)
-
+    
 client.run(os.environ["DISCORD_TOKEN"])

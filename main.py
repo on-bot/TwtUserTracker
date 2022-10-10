@@ -10,7 +10,7 @@ from pymongo import MongoClient
 cluster = MongoClient(os.environ["MONGO_API"])
 db = cluster["discord"]
 collection = db["twitter followings"]
-ollection2 = db["config"]
+collection2 = db["config"]
 
 # Getting config datas
 config = collection2.find_one({"_id": 0})

@@ -1,33 +1,26 @@
 # Imports
 import tweepy
-import json
 import os
 import time
 import collections
 from discord_webhook import DiscordWebhook, DiscordEmbed
 from pymongo import MongoClient
 
-# Importing Database
-cluster = MongoClient(os.environ["MONGO_API"])
-db = cluster["discord"]
-collection = db["twitter followings"]
-
 # Getting config datas
-conf = open("./config/config.json")
-config = json.load(conf)
+config = collection.find_one({"_id": 0})
 
 # Twitter auth
-client = tweepy.Client(bearer_token=os.environ["BEARER_TOKEN"],
-                       consumer_key=os.environ["CONSUMER_KEY"],
-                       consumer_secret=os.environ["CONSUMER_SECRET"],
-                       access_token=os.environ["ACCESS_TOKEN"],
-                       access_token_secret=os.environ["ACCESS_TOKEN_SECRET"],
+client = tweepy.Client(bearer_token=config['twitter_credentials']['bearer_token'],
+                       consumer_key=config['twitter_credentials']['consumer_key'],
+                       consumer_secret=config['twitter_credentials']['consumer_secret'],
+                       access_token=config['twitter_credentials']['access_token'],
+                       access_token_secret=config['twitter_credentials']['access_token_secret'],
                        wait_on_rate_limit=True)
 
-auth = tweepy.OAuth1UserHandler(os.environ["CONSUMER_KEY"],
-                                os.environ["CONSUMER_SECRET"],
-                                os.environ["ACCESS_TOKEN"],
-                                os.environ["ACCESS_TOKEN_SECRET"])
+auth = tweepy.OAuth1UserHandler(config['twitter_credentials']['consumer_key'],
+                                config['twitter_credentials']['consumer_secret'],
+                                config['twitter_credentials']['access_token'],
+                                config['twitter_credentials']['access_token_secret'])
 
 
 api = tweepy.API(auth, wait_on_rate_limit=True)
@@ -98,9 +91,7 @@ def is_same(list1, list2):
 
 # Polling Twitter Followings
 while 1:
-    conf = open("./config/config.json")
-    config = json.load(conf)
-    victims = config['victims']
+    victims = collection.find_one({"_id": 0})['victims']
     delay = 60
     if is_empty():
         for i in victims:

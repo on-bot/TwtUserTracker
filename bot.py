@@ -21,7 +21,10 @@ intents.members = True
 client = commands.Bot(intents=intents, command_prefix='.')
 
 # Getting config datas
-config = collection.find_one({"_id": 0})
+config = collection.find_one({"_id": 0})  # If you stored your keys on MONGODB
+
+# conf = open("./config/config.json")   # If you are using config.json then comment the above line and uncomment these two lines
+# config = json.load(conf)
 
 # Twitter auth
 auth = tweepy.OAuth1UserHandler(config['twitter_credentials']['consumer_key'],

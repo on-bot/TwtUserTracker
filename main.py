@@ -119,7 +119,7 @@ while 1:
 
     for i in victims:
         print(f"checking: {i}")
-        send_log(i, os.environ["LOG_WEBHOOK"])
+#         send_log(i, os.environ["LOG_WEBHOOK"])
         send_log(i, os.environ["SEC_LOG_WEBHOOK"])
         victim_new_followings_ids = scrape_user_friends(i)
         victim_followings_ids = collection.find_one({"_id": i})['followings']
@@ -133,9 +133,9 @@ while 1:
                     try:
                         new_users.append(get_screen_name(user))
                     except:
-                        send_message(f"{user} was followed", os.environ['MAIN_WEBHOOK'])
+                        send_message(f"{user} was followed", os.environ['SEC_WEBHOOK'])
         for user in new_users:
-            send_embed_message(i, user, os.environ["MAIN_WEBHOOK"])
+#             send_embed_message(i, user, os.environ["MAIN_WEBHOOK"])
             send_embed_message(i, user, os.environ["SEC_WEBHOOK"])
             print(f"detected: {user}")
         time.sleep(delay)

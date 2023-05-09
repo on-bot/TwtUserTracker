@@ -95,7 +95,7 @@ async def addwallet(ctx, wallet):
 @client.command()
 async def removewallet(ctx, wallet):
     datas = collection.find_one({"_id": 0})
-    if username in datas['wallets']:
+    if wallet in datas['wallets']:
         datas['wallets'].remove(wallet)
         collection.delete_one({"_id": 0})
         collection.insert_one(datas)

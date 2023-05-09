@@ -83,7 +83,7 @@ async def addwallet(ctx, wallet):
     if wallet in datas['wallets']:
         await ctx.send("User is already on tracklist")
         return
-    if len(wallet) != 40:
+    if len(wallet) != 42:
         await ctx.send("invalid wallet")
         return
     datas['victims'].append(wallet)

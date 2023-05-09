@@ -84,8 +84,8 @@ async def addwallet(ctx, wallet):
         await ctx.send("User is already on tracklist")
         return
     if len(wallet) != 40:
-    await ctx.send("invalid wallet")
-    return
+        await ctx.send("invalid wallet")
+        return
     datas['victims'].append(wallet)
     collection.delete_one({"_id": 0})
     collection.insert_one(datas)

@@ -75,5 +75,32 @@ async def showtracks(ctx):
     embed.timestamp = datetime.datetime.utcnow()
     embed.set_footer(text='\u200b')
     await ctx.send(embed=embed)
+
+    
+@client.command()
+async def addwallet(ctx, wallet):
+    datas = collection.find_one({"_id": 0})
+    if wallet in datas['wallets']:
+        await ctx.send("User is already on tracklist")
+        return
+    if len(wallet) != 40:
+    await ctx.send("invalid wallet")
+    return
+    datas['victims'].append(wallet)
+    collection.delete_one({"_id": 0})
+    collection.insert_one(datas)
+    await ctx.send(f"{wallet} has been added successfully")
+
+
+@client.command()
+async def remove(ctx, wallet):
+    datas = collection.find_one({"_id": 0})
+    if username in datas['wallets']:
+        datas['wallets'].remove(wallet)
+        collection.delete_one({"_id": 0})
+        collection.insert_one(datas)
+        await ctx.send(f"{wallet} has been removed successfully")
+    else:
+        await ctx.send(f"{wallet} was never added")
     
 client.run(os.environ["DISCORD_TOKEN"])

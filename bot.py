@@ -86,7 +86,7 @@ async def addwallet(ctx, wallet):
     if len(wallet) != 42:
         await ctx.send("invalid wallet")
         return
-    datas['victims'].append(wallet)
+    datas['wallets'].append(wallet)
     collection.delete_one({"_id": 0})
     collection.insert_one(datas)
     await ctx.send(f"{wallet} has been added successfully")

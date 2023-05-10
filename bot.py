@@ -78,7 +78,7 @@ async def showtracks(ctx):
 
     
 @client.command()
-async def addwallet(ctx, wallet):
+async def addwallet(ctx, wallet, nickname):
     datas = collection.find_one({"_id": 0})
     if wallet in datas['wallets']:
         await ctx.send("User is already on tracklist")
@@ -86,21 +86,34 @@ async def addwallet(ctx, wallet):
     if len(wallet) != 42:
         await ctx.send("invalid wallet")
         return
-    datas['wallets'].append(wallet)
+    datas['wallets'][wallet.lower()] = nickname.lower()
     collection.delete_one({"_id": 0})
     collection.insert_one(datas)
     await ctx.send(f"{wallet} has been added successfully")
 
 
 @client.command()
-async def removewallet(ctx, wallet):
+async def removewallet(ctx, iden):
     datas = collection.find_one({"_id": 0})
-    if wallet in datas['wallets']:
-        datas['wallets'].remove(wallet)
-        collection.delete_one({"_id": 0})
-        collection.insert_one(datas)
-        await ctx.send(f"{wallet} has been removed successfully")
+    iden = iden.lower()
+    if iden in datas['wallets'].keys():
+        del datas['wallets'][iden]
+        collection.replace_one({"_id": 0}, datas)
+        await ctx.send(f"{iden} has been removed successfully")
+    elif iden in datas['wallets'].values():
+        key = [k for k, v in datas['wallets'].items() if v == iden][0]
+        del datas['wallets'][key]
+        collection.replace_one({"_id": 0}, datas)
+        await ctx.send(f"{iden} has been removed successfully")
     else:
-        await ctx.send(f"{wallet} was never added")
+        await ctx.send(f"{iden} was never added")
+
+@client.command()
+async def showwallets(ctx):
+    wallets = collection.find_one({"_id": 0})["wallets"]
+    temp = ""
+    for key, value in wallets.items():
+        temp += f"{value} : {key}\n"
+    await ctx.send(temp)
     
 client.run(os.environ["DISCORD_TOKEN"])
